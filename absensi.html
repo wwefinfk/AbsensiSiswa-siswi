@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartAttendance - Absensi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {"50":"#eff6ff","100":"#dbeafe","200":"#bfdbfe","300":"#93c5fd","400":"#60a5fa","500":"#3b82f6","600":"#2563eb","700":"#1d4ed8","800":"#1e40af","900":"#1e3a8a"},
+                        secondary: {"50":"#fdf2f8","100":"#fce7f3","200":"#fbcfe8","300":"#f9a8d4","400":"#f472b6","500":"#ec4899","600":"#db2777","700":"#be185d","800":"#9d174d","900":"#831843"},
+                        dark: {"50":"#f9fafb","100":"#f3f4f6","200":"#e5e7eb","300":"#d1d5db","400":"#9ca3af","500":"#6b7280","600":"#4b5563","700":"#374151","800":"#1f2937","900":"#111827"},
+                        premium: {"50":"#f0f9ff","100":"#e0f2fe","200":"#bae6fd","300":"#7dd3fc","400":"#38bdf8","500":"#0ea5e9","600":"#0284c7","700":"#0369a1","800":"#075985","900":"#0c4a6e"},
+                        ai: {"50":"#f0fdfa","100":"#ccfbf1","200":"#99f6e4","300":"#5eead4","400":"#2dd4bf","500":"#14b8a6","600":"#0d9488","700":"#0f766e","800":"#115e59","900":"#134e4a"}
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            color: #f3f4f6;
+        }
+        
+        .header-gradient {
+            background: linear-gradient(90deg, #0ea5e9 0%, #0d9488 100%);
+        }
+        
+        .card-gradient {
+            background: linear-gradient(135deg, #1e3a8a 0%, #0c4a6e 100%);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+        
+        .sidebar {
+            background: rgba(17, 24, 39, 0.8);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(55, 65, 81, 0.5);
+        }
+        
+        .ai-chip {
+            background: linear-gradient(45deg, #0d9488, #14b8a6);
+            animation: pulse 2s infinite;
+        }
+        
+        .attendance-card {
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .attendance-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .status-present { background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%); }
+        .status-permit { background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%); }
+        .status-sick { background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%); }
+        .status-alpha { background: linear-gradient(135deg, #ef4444 0%, #f87171 100%); }
+        
+        .glass-effect {
+            background: rgba(31, 41, 55, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(55, 65, 81, 0.5);
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .ai-prediction-card {
+            background: linear-gradient(135deg, #134e4a 0%, #115e59 100%);
+            border: 1px solid rgba(20, 184, 166, 0.3);
+        }
+        
+        .floating-element {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .floating-element-2 {
+            animation: float 8s ease-in-out infinite;
+            animation-delay: 1s;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(13, 148, 136, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(13, 148, 136, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(13, 148, 136, 0); }
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1f2937;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4b5563;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Floating Elements -->
+    <div class="fixed top-20 left-10 w-64 h-64 bg-gradient-to-br from-ai-500 to-ai-700 rounded-full filter blur-[100px] opacity-20 floating-element"></div>
+    <div class="fixed bottom-10 right-10 w-80 h-80 bg-gradient-to-br from-premium-500 to-premium-700 rounded-full filter blur-[120px] opacity-20 floating-element-2"></div>
+    
+    <!-- Navigation -->
+    <div class="fixed top-0 left-0 w-full z-50">
+        <div class="header-gradient py-4 px-6 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center">
+                    <i class="fas fa-fingerprint text-premium-600 text-xl"></i>
+                </div>
+                <h1 class="text-xl font-bold text-white">Smart<span class="font-light">Attendance</span></h1>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <button class="text-white">
+                        <i class="fas fa-bell text-xl"></i>
+                    </button>
+                    <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+                </div>
+                
+                <div class="flex items-center space-x-2 cursor-pointer">
+                    <div class="w-8 h-8 rounded-full bg-premium-300 flex items-center justify-center">
+                        <span class="text-premium-900 font-bold">A</span>
+                    </div>
+                    <span class="text-white font-medium">Admin</span>
+                    <i class="fas fa-chevron-down text-white"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-gray-800 py-3 px-6 flex justify-between items-center">
+            <div class="flex space-x-1">
+                <span class="text-gray-300">Absensi</span>
+                <span class="text-gray-500"><i class="fas fa-chevron-right"></i></span>
+                <span class="text-premium-300">Form Input</span>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-calendar text-premium-300"></i>
+                    <span id="current-date" class="text-gray-300">Minggu, 1 Agustus 2025</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-clock text-premium-300"></i>
+                    <span id="current-time" class="text-gray-300">12:00:00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sidebar -->
+    <div class="fixed top-20 left-0 h-[calc(100vh-5rem)] w-64 sidebar z-40">
+        <div class="py-6 px-4">
+            <div class="mb-8">
+                <h2 class="text-gray-400 text-xs uppercase tracking-wider mb-3">Menu Utama</h2>
+                <ul class="space-y-2">
+                    <li>
+                        <a href="index.html" class="flex items-center space-x-3 py-2 px-3 text-gray-300 hover:bg-gray-700/50 rounded-lg transition">
+                            <i class="fas fa-home"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="absensi.html" class="flex items-center space-x-3 py-2 px-3 bg-premium-900/30 text-premium-300 rounded-lg">
+                            <i class="fas fa-clipboard-check"></i>
+                            <span>Absensi</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="siswa.html" class="flex items-center space-x-3 py-2 px-3 text-gray-300 hover:bg-gray-700/50 rounded-lg transition">
+                            <i class="fas fa-users"></i>
+                            <span>Daftar Siswa</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="riwayat.html" class="flex items-center space-x-3 py-2 px-3 text-gray-300 hover:bg-gray-700/50 rounded-lg transition">
+                            <i class="fas fa-history"></i>
+                            <span>Riwayat Absensi</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="laporan.html" class="flex items-center space-x-3 py-2 px-3 text-gray-300 hover:bg-gray-700/50 rounded-lg transition">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>Laporan & Ekspor</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="mb-8">
+                <h2 class="text-gray-400 text-xs uppercase tracking-wider mb-3">Sistem & AI</h2>
+                <ul class="space-y-2">
+                    <li>
+                        <a href="pengaturan.html" class="flex items-center space-x-3 py-2 px-3 text-gray-300 hover:bg-gray-700/50 rounded-lg transition">
+                            <i class="fas fa-cog"></i>
+                            <span>Pengaturan</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center space-x-3 py-2 px-3 text-gray-300 hover:bg-gray-700/50 rounded-lg transition">
+                            <i class="fas fa-brain"></i>
+                            <span>Analisis AI</span>
+                            <span class="ai-chip px-2 py-0.5 text-xs rounded-full text-white">Baru</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div>
+                <h2 class="text-gray-400 text-xs uppercase tracking-wider mb-3">Lainnya</h2>
+                <ul class="space-y-2">
+                    <li>
+                        <a href="tentang.html" class="flex items-center space-x-3 py-2 px-3 text-gray-300 hover:bg-gray-700/50 rounded-lg transition">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Tentang</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center space-x-3 py-2 px-3 text-gray-300 hover:bg-gray-700/50 rounded-lg transition">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Keluar</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content - Halaman Absensi -->
+    <div class="pt-28 pl-72 pr-6 pb-10 min-h-screen">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-white">Form Absensi</h1>
+            <p class="text-gray-400">Input kehadiran siswa untuk hari ini</p>
+        </div>
+
+        <!-- Filter Kelas -->
+        <div class="glass-effect rounded-xl p-6 mb-8" data-aos="fade-up">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                <div class="mb-4 md:mb-0">
+                    <h2 class="text-xl font-bold text-white">Kelas XI TKJ 1</h2>
+                    <p class="text-gray-400">Total 34 siswa</p>
+                </div>
+                <div class="flex space-x-3">
+                    <div class="relative">
+                        <input type="text" id="search-student" placeholder="Cari siswa..." class="pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-premium-500">
+                        <i class="fas fa-search absolute left-3 top-3 text-gray-500"></i>
+                    </div>
+                    <button id="reload-btn" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition">
+                        <i class="fas fa-sync-alt mr-2"></i>Muat Ulang
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Daftar Siswa -->
+        <div id="students-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Card Siswa 1 -->
+            <div class="attendance-card bg-gray-800 rounded-xl overflow-hidden" data-aos="zoom-in">
+                <div class="p-5">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="font-bold text-white text-lg">Andi Setiawan</h3>
+                            <p class="text-gray-400 text-sm">NIS: 202311001</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-premium-500/20 flex items-center justify-center">
+                            <span class="text-premium-300 font-bold">A</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-5">
+                        <label class="block text-gray-400 text-sm mb-2">Status Kehadiran</label>
+                        <div class="relative">
+                            <select class="w-full bg-gray-700 border border-gray-600 text-white py-2 px-4 rounded-lg focus:outline-none focus:border-premium-500 appearance-none">
+                                <option value="hadir" class="bg-gray-800">Hadir</option>
+                                <option value="izin" class="bg-gray-800">Izin</option>
+                                <option value="sakit" class="bg-gray-800">Sakit</option>
+                                <option value="alpha" class="bg-gray-800">Alpha</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Card Siswa 2 -->
+            <div class="attendance-card bg-gray-800 rounded-xl overflow-hidden" data-aos="zoom-in" data-aos-delay="50">
+                <div class="p-5">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="font-bold text-white text-lg">Budi Santoso</h3>
+                            <p class="text-gray-400 text-sm">NIS: 202311002</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-yellow-500/20 flex items-center justify-center">
+                            <span class="text-yellow-300 font-bold">B</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-5">
+                        <label class="block text-gray-400 text-sm mb-2">Status Kehadiran</label>
+                        <div class="relative">
+                            <select class="w-full bg-gray-700 border border-gray-600 text-white py-2 px-4 rounded-lg focus:outline-none focus:border-premium-500 appearance-none">
+                                <option value="hadir" class="bg-gray-800">Hadir</option>
+                                <option value="izin" class="bg-gray-800" selected>Izin</option>
+                                <option value="sakit" class="bg-gray-800">Sakit</option>
+                                <option value="alpha" class="bg-gray-800">Alpha</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Card Siswa 3 -->
+            <div class="attendance-card bg-gray-800 rounded-xl overflow-hidden" data-aos="zoom-in" data-aos-delay="100">
+                <div class="p-5">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="font-bold text-white text-lg">Citra Dewi</h3>
+                            <p class="text-gray-400 text-sm">NIS: 202311003</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center">
+                            <span class="text-blue-300 font-bold">C</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-5">
+                        <label class="block text-gray-400 text-sm mb-2">Status Kehadiran</label>
+                        <div class="relative">
+                            <select class="w-full bg-gray-700 border border-gray-600 text-white py-2 px-4 rounded-lg focus:outline-none focus:border-premium-500 appearance-none">
+                                <option value="hadir" class="bg-gray-800" selected>Hadir</option>
+                                <option value="izin" class="bg-gray-800">Izin</option>
+                                <option value="sakit" class="bg-gray-800">Sakit</option>
+                                <option value="alpha" class="bg-gray-800">Alpha</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Card Siswa 4 -->
+            <div class="attendance-card bg-gray-800 rounded-xl overflow-hidden" data-aos="zoom-in" data-aos-delay="150">
+                <div class="p-5">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="font-bold text-white text-lg">Dian Pratama</h3>
+                            <p class="text-gray-400 text-sm">NIS: 202311004</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center">
+                            <span class="text-red-300 font-bold">D</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-5">
+                        <label class="block text-gray-400 text-sm mb-2">Status Kehadiran</label>
+                        <div class="relative">
+                            <select class="w-full bg-gray-700 border border-gray-600 text-white py-2 px-4 rounded-lg focus:outline-none focus:border-premium-500 appearance-none">
+                                <option value="hadir" class="bg-gray-800">Hadir</option>
+                                <option value="izin" class="bg-gray-800">Izin</option>
+                                <option value="sakit" class="bg-gray-800">Sakit</option>
+                                <option value="alpha" class="bg-gray-800" selected>Alpha</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Card Siswa 5 -->
+            <div class="attendance-card bg-gray-800 rounded-xl overflow-hidden" data-aos="zoom-in" data-aos-delay="200">
+                <div class="p-5">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="font-bold text-white text-lg">Eka Putri</h3>
+                            <p class="text-gray-400 text-sm">NIS: 202311005</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center">
+                            <span class="text-green-300 font-bold">E</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-5">
+                        <label class="block text-gray-400 text-sm mb-2">Status Kehadiran</label>
+                        <div class="relative">
+                            <select class="w-full bg-gray-700 border border-gray-600 text-white py-2 px-4 rounded-lg focus:outline-none focus:border-premium-500 appearance-none">
+                                <option value="hadir" class="bg-gray-800" selected>Hadir</option>
+                                <option value="izin" class="bg-gray-800">Izin</option>
+                                <option value="sakit" class="bg-gray-800">Sakit</option>
+                                <option value="alpha" class="bg-gray-800">Alpha</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Card Siswa 6 -->
+            <div class="attendance-card bg-gray-800 rounded-xl overflow-hidden" data-aos="zoom-in" data-aos-delay="250">
+                <div class="p-5">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="font-bold text-white text-lg">Fajar Nugroho</h3>
+                            <p class="text-gray-400 text-sm">NIS: 202311006</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center">
+                            <span class="text-purple-300 font-bold">F</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-5">
+                        <label class="block text-gray-400 text-sm mb-2">Status Kehadiran</label>
+                        <div class="relative">
+                            <select class="w-full bg-gray-700 border border-gray-600 text-white py-2 px-4 rounded-lg focus:outline-none focus:border-premium-500 appearance-none">
+                                <option value="hadir" class="bg-gray-800">Hadir</option>
+                                <option value="izin" class="bg-gray-800">Izin</option>
+                                <option value="sakit" class="bg-gray-800" selected>Sakit</option>
+                                <option value="alpha" class="bg-gray-800">Alpha</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Card Siswa 7 -->
+            <div class="attendance-card bg-gray-800 rounded-xl overflow-hidden" data-aos="zoom-in" data-aos-delay="300">
+                <div class="p-5">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="font-bold text-white text-lg">Gita Maharani</h3>
+                            <p class="text-gray-400 text-sm">NIS: 202311007</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-pink-500/20 flex items-center justify-center">
+                            <span class="text-pink-300 font-bold">G</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-5">
+                        <label class="block text-gray-400 text-sm mb-2">Status Kehadiran</label>
+                        <div class="relative">
+                            <select class="w-full bg-gray-700 border border-gray-600 text-white py-2 px-4 rounded-lg focus:outline-none focus:border-premium-500 appearance-none">
+                                <option value="hadir" class="bg-gray-800" selected>Hadir</option>
+                                <option value="izin" class="bg-gray-800">Izin</option>
+                                <option value="sakit" class="bg-gray-800">Sakit</option>
+                                <option value="alpha" class="bg-gray-800">Alpha</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Card Siswa 8 -->
+            <div class="attendance-card bg-gray-800 rounded-xl overflow-hidden" data-aos="zoom-in" data-aos-delay="350">
+                <div class="p-5">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="font-bold text-white text-lg">Hendra Setiawan</h3>
+                            <p class="text-gray-400 text-sm">NIS: 202311008</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-indigo-500/20 flex items-center justify-center">
+                            <span class="text-indigo-300 font-bold">H</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-5">
+                        <label class="block text-gray-400 text-sm mb-2">Status Kehadiran</label>
+                        <div class="relative">
+                            <select class="w-full bg-gray-700 border border-gray-600 text-white py-2 px-4 rounded-lg focus:outline-none focus:border-premium-500 appearance-none">
+                                <option value="hadir" class="bg-gray-800">Hadir</option>
+                                <option value="izin" class="bg-gray-800" selected>Izin</option>
+                                <option value="sakit" class="bg-gray-800">Sakit</option>
+                                <option value="alpha" class="bg-gray-800">Alpha</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tombol Simpan -->
+        <div class="flex justify-end">
+            <button id="save-attendance" class="px-6 py-3 bg-premium-600 hover:bg-premium-500 text-white rounded-lg font-medium transition flex items-center" data-aos="fade-left">
+                <i class="fas fa-save mr-2"></i> Simpan Absensi
+            </button>
+        </div>
+        
+        <!-- Footer -->
+        <div class="text-center text-gray-500 text-sm pt-8 border-t border-gray-800">
+            <p>© 2025 SmartAttendance. Dibuat oleh Yogi Adi Pratama (XI TKJ). Seluruh hak cipta dilindungi.</p>
+            <div class="flex justify-center space-x-4 mt-3">
+                <a href="#" class="text-gray-500 hover:text-premium-400"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="text-gray-500 hover:text-premium-400"><i class="fab fa-github"></i></a>
+                <a href="#" class="text-gray-500 hover:text-premium-400"><i class="fab fa-linkedin"></i></a>
+                <a href="#" class="text-gray-500 hover:text-premium-400"><i class="fab fa-twitter"></i></a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script>
+        // Inisialisasi AOS
+        AOS.init({
+            duration: 800,
+            once: true,
+            easing: 'ease-out-quart'
+        });
+        
+        // Update tanggal dan waktu secara realtime
+        function updateDateTime() {
+            const now = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric'
+            };
+            document.getElementById('current-date').textContent = now.toLocaleDateString('id-ID', options);
+            document.getElementById('current-time').textContent = now.toLocaleTimeString('id-ID');
+        }
+        setInterval(updateDateTime, 1000);
+        updateDateTime();
+        
+        // Toast Notification
+        function showSuccessToast(message) {
+            Toastify({
+                text: message,
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",
+                stopOnFocus: true
+            }).showToast();
+        }
+        
+        function showErrorToast(message) {
+            Toastify({
+                text: message,
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
+                stopOnFocus: true
+            }).showToast();
+        }
+        
+        // Inisialisasi Supabase
+        const SUPABASE_URL = 'https://your-project.supabase.co';
+        const SUPABASE_KEY = 'your-anon-key';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        // Fungsi untuk menyimpan absensi
+        async function saveAttendance() {
+            try {
+                const today = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
+                const students = document.querySelectorAll('.attendance-card');
+                
+                // Simpan satu per satu ke Supabase
+                for (const studentCard of students) {
+                    const name = studentCard.querySelector('h3').textContent;
+                    const statusSelect = studentCard.querySelector('select');
+                    const status = statusSelect.value;
+                    
+                    const { error } = await supabase
+                        .from('absensi')
+                        .insert([
+                            { 
+                                nama: name, 
+                                status: status, 
+                                tanggal: today 
+                            }
+                        ]);
+                    
+                    if (error) throw error;
+                }
+                
+                showSuccessToast('Absensi berhasil disimpan!');
+            } catch (error) {
+                console.error('Error saving attendance:', error);
+                showErrorToast('Gagal menyimpan absensi');
+            }
+        }
+        
+        // Event Listeners
+        document.getElementById('save-attendance').addEventListener('click', saveAttendance);
+        document.getElementById('reload-btn').addEventListener('click', () => {
+            location.reload();
+        });
+        
+        // Pencarian siswa
+        document.getElementById('search-student').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const cards = document.querySelectorAll('.attendance-card');
+            
+            cards.forEach(card => {
+                const name = card.querySelector('h3').textContent.toLowerCase();
+                if (name.includes(searchTerm)) {
+                    card.classList.remove('hidden');
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

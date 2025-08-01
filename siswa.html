@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartAttendance - Daftar Siswa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {"50":"#eff6ff","100":"#dbeafe","200":"#bfdbfe","300":"#93c5fd","400":"#60a5fa","500":"#3b82f6","600":"#2563eb","700":"#1d4ed8","800":"#1e40af","900":"#1e3a8a"},
+                        secondary: {"50":"#fdf2f8","100":"#fce7f3","200":"#fbcfe8","300":"#f9a8d4","400":"#f472b6","500":"#ec4899","600":"#db2777","700":"#be185d","800":"#9d174d","900":"#831843"},
+                        dark: {"50":"#f9fafb","100":"#f3f4f6","200":"#e5e7eb","300":"#d1d5db","400":"#9ca3af","500":"#6b7280","600":"#4b5563","700":"#374151","800":"#1f2937","900":"#111827"},
+                        premium: {"50":"#f0f9ff","100":"#e0f2fe","200":"#bae6fd","300":"#7dd3fc","400":"#38bdf8","500":"#0ea5e9","600":"#0284c7","700":"#0369a1","800":"#075985","900":"#0c4a6e"},
+                        ai: {"50":"#f0fdfa","100":"#ccfbf1","200":"#99f6e4","300":"#5eead4","400":"#2dd4bf","500":"#14b8a6","600":"#0d9488","700":"#0f766e","800":"#115e59","900":"#134e4a"}
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            color: #f3f4f6;
+        }
+        
+        .header-gradient {
+            background: linear-gradient(90deg, #0ea5e9 0%, #0d9488 100%);
+        }
+        
+        .card-gradient {
+            background: linear-gradient(135deg, #1e3a8a 0%, #0c4a6e 100%);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+        
+        .sidebar {
+            background: rgba(17, 24, 39, 0.8);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(55, 65, 81, 0.5);
+        }
+        
+        .ai-chip {
+            background: linear-gradient(45deg, #0d9488, #14b8a6);
+            animation: pulse 2s infinite;
+        }
+        
+        .attendance-card {
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .attendance-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .status-present { background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%); }
+        .status-permit { background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%); }
+        .status-sick { background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%); }
+        .status-alpha { background: linear-gradient(135deg, #ef4444 0%, #f87171 100%); }
+        
+        .glass-effect {
+            background: rgba(31, 41, 55, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(55, 65, 81, 0.5);
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .ai-prediction-card {
+            background: linear-gradient(135deg, #134e4a 0%, #115e59 100%);
+            border: 1px solid rgba(20, 184, 166, 0.3);
+        }
+        
+        .floating-element {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .floating-element-2 {
+            animation: float 8s ease-in-out infinite;
+            animation-delay: 1s;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(13, 148, 136, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(13, 148, 136, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(13, 148, 136, 0); }
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1f2937;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4b5563;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Floating Elements -->
+    <div class="fixed top-20 left-10 w-64 h-64 bg-gradient-to-br from-ai-500 to-ai-700 rounded-full filter blur-[100px] opacity-20 floating-element"></div>
+    <div class="fixed bottom-10 right-10 w-80 h-80 bg-gradient-to-br from-premium-500 to-premium-700 rounded-full filter blur-[120px] opacity-20 floating-element-2"></div>
+    
+    <!-- Navigation -->
+    <div class="fixed top-0 left-0 w-full z-50">
+        <div class="header-gradient py-4 px-6 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center">
+                    <i class="fas fa-fingerprint text-premium-600 text-xl"></i>
+                </div>
+                <h1 class="text-xl font-bold text-white">Smart<span class="font-light">Attendance</span></h1>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <button class="text-white">
+                        <i class="fas fa-bell text-xl"></i>
+                    </button>
+                    <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+                </div>
+                
+                <div class="flex items-center space-x-2 cursor-pointer">
+                    <div class="w-8 h-8 rounded-full bg-premium-300 flex items-center justify-center">
+                        <span class="text-premium-900 font-bold">A</span>
+                    </div>
+                    <span class="text-white font-medium">Admin</span>
+                    <i class="fas fa-chevron-down text-white"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-gray-800 py-3 px-6 flex justify-between items-center">
+            <div class="flex space-x-1">
+                <span class="text-gray-300">Siswa</span>
+                <span class="text-gray-500"><i class="fas fa-chevron-right"></i></span>
+                <span class="text-premium-300">Daftar Siswa</span>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-calendar text-premium-300"></i>
+                    <span id="current-date" class="text-gray-300">Minggu, 1 Agustus 2025</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-clock text-premium-300"></i>
+                    <span id="current-time" class="text-gray-300">12:00:00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sidebar -->
+    <div class="fixed top-20 left-0 h-[calc(100vh-5rem)] w-64 sidebar z-40">
+        <div class="py-6 px-4">
+            <div class="mb-8">
+                <h2 class="text-gray-400 text-xs uppercase tracking-wider mb-3">Menu Utama</h2>
+                <ul class="space-y-2">
+                    <li>
+                        <a href="index.html" class="flex items-center space-x-3 py-2 px-3 text-gray-300 hover:bg-gray-700/50 rounded-lg transition">
+                            <i class="fas fa-home"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="absensi.html" class="flex items-center space-x-3 py-2 px-3 text-gray-300 hover:bg-gray-700/50 rounded-lg transition">
+                            <i class="fas fa-clipboard-check"></i>
+                            <span>Absensi</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="siswa.html" class="flex items-center space-x-3 py-2 px-3 bg-premium-900/30 text-premium-300 rounded-lg">
+                            <i class="fas fa-users"></i>
+                            <span>Daftar Siswa</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="riwayat.html" class="flex items-center space-x-3 py-2 px-3 text-gray-300 hover:bg-gray-700/50 rounded-lg transition">
+                            <i class="fas fa-history"></i>
+                            <span>Riwayat Absensi</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="laporan.html" class="flex items-center space-x-3 py-2 px-3 text-gray-300 hover:bg-gray-700/50 rounded-lg transition">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>Laporan & Ekspor</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="mb-8">
+                <h2 class="text-gray-400 text-xs uppercase tracking-wider mb-3">Sistem & AI</h2>
+                <ul class="space-y-2">
+                    <li>
+                        <a href="pengaturan.html" class="flex items-center space-x-3 py-2 px-3 text-gray-300 hover:bg-gray-700/50 rounded-lg transition">
+                            <i class="fas fa-cog"></i>
+                            <span>Pengaturan</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center space-x-3 py-2 px-3 text-gray-300 hover:bg-gray-700/50 rounded-lg transition">
+                            <i class="fas fa-brain"></i>
+                            <span>Analisis AI</span>
+                            <span class="ai-chip px-2 py-0.5 text-xs rounded-full text-white">Baru</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div>
+                <h2 class="text-gray-400 text-xs uppercase tracking-wider mb-3">Lainnya</h2>
+                <ul class="space-y-2">
+                    <li>
+                        <a href="tentang.html" class="flex items-center space-x-3 py-2 px-3 text-gray-300 hover:bg-gray-700/50 rounded-lg transition">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Tentang</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center space-x-3 py-2 px-3 text-gray-300 hover:bg-gray-700/50 rounded-lg transition">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Keluar</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content - Halaman Daftar Siswa -->
+    <div class="pt-28 pl-72 pr-6 pb-10 min-h-screen">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-white">Daftar Siswa</h1>
+            <p class="text-gray-400">Kelola data siswa kelas XI TKJ</p>
+        </div>
+
+        <!-- Toolbar: Tambah Siswa dan Pencarian -->
+        <div class="glass-effect rounded-xl p-6 mb-8" data-aos="fade-up">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                <div class="mb-4 md:mb-0">
+                    <h2 class="text-xl font-bold text-white">Kelas XI TKJ 1</h2>
+                    <p class="text-gray-400">Total <span id="total-students">34</span> siswa</p>
+                </div>
+                <div class="flex space-x-3">
+                    <div class="relative">
+                        <input type="text" id="search-student" placeholder="Cari siswa..." class="pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-premium-500">
+                        <i class="fas fa-search absolute left-3 top-3 text-gray-500"></i>
+                    </div>
+                    <button id="add-student-btn" class="px-4 py-2 bg-premium-600 hover:bg-premium-500 text-white rounded-lg transition flex items-center">
+                        <i class="fas fa-plus mr-2"></i> Tambah Siswa
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tabel Siswa -->
+        <div class="glass-effect rounded-xl p-6 mb-8" data-aos="fade-up">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="text-left text-gray-400 border-b border-gray-700">
+                            <th class="pb-4">Nama</th>
+                            <th class="pb-4">NIS</th>
+                            <th class="pb-4">Kelas</th>
+                            <th class="pb-4">Kehadiran</th>
+                            <th class="pb-4 text-right">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="students-table-body">
+                        <!-- Data siswa akan diisi oleh JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            <div class="flex justify-between items-center mt-6">
+                <div class="text-gray-400 text-sm">
+                    Menampilkan <span id="current-page">1</span> dari <span id="total-pages">5</span> halaman
+                </div>
+                <div class="flex space-x-2">
+                    <button id="prev-page" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button id="next-page" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="text-center text-gray-500 text-sm pt-8 border-t border-gray-800">
+            <p>© 2025 SmartAttendance. Dibuat oleh Yogi Adi Pratama (XI TKJ). Seluruh hak cipta dilindungi.</p>
+            <div class="flex justify-center space-x-4 mt-3">
+                <a href="#" class="text-gray-500 hover:text-premium-400"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="text-gray-500 hover:text-premium-400"><i class="fab fa-github"></i></a>
+                <a href="#" class="text-gray-500 hover:text-premium-400"><i class="fab fa-linkedin"></i></a>
+                <a href="#" class="text-gray-500 hover:text-premium-400"><i class="fab fa-twitter"></i></a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Tambah/Edit Siswa -->
+    <div id="student-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-gray-800 rounded-xl w-full max-w-md mx-4">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold text-white" id="modal-title">Tambah Siswa</h2>
+                    <button id="close-modal" class="text-gray-400 hover:text-white">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <form id="student-form">
+                    <input type="hidden" id="student-id">
+                    <div class="mb-4">
+                        <label for="name" class="block text-gray-400 text-sm mb-2">Nama Lengkap</label>
+                        <input type="text" id="name" class="w-full bg-gray-700 border border-gray-600 text-white py-2 px-4 rounded-lg focus:outline-none focus:border-premium-500" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="nis" class="block text-gray-400 text-sm mb-2">Nomor Induk Siswa (NIS)</label>
+                        <input type="text" id="nis" class="w-full bg-gray-700 border border-gray-600 text-white py-2 px-4 rounded-lg focus:outline-none focus:border-premium-500" required>
+                    </div>
+                    <div class="mb-6">
+                        <label for="class" class="block text-gray-400 text-sm mb-2">Kelas</label>
+                        <select id="class" class="w-full bg-gray-700 border border-gray-600 text-white py-2 px-4 rounded-lg focus:outline-none focus:border-premium-500 appearance-none">
+                            <option value="XI TKJ 1" selected>XI TKJ 1</option>
+                            <option value="XI TKJ 2">XI TKJ 2</option>
+                            <option value="XI TKJ 3">XI TKJ 3</option>
+                        </select>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-3">
+                        <button type="button" id="cancel-modal" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition">
+                            Batal
+                        </button>
+                        <button type="submit" class="px-4 py-2 bg-premium-600 hover:bg-premium-500 text-white rounded-lg transition">
+                            Simpan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script>
+        // Inisialisasi AOS
+        AOS.init({
+            duration: 800,
+            once: true,
+            easing: 'ease-out-quart'
+        });
+        
+        // Update tanggal dan waktu secara realtime
+        function updateDateTime() {
+            const now = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric'
+            };
+            document.getElementById('current-date').textContent = now.toLocaleDateString('id-ID', options);
+            document.getElementById('current-time').textContent = now.toLocaleTimeString('id-ID');
+        }
+        setInterval(updateDateTime, 1000);
+        updateDateTime();
+        
+        // Toast Notification
+        function showSuccessToast(message) {
+            Toastify({
+                text: message,
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",
+                stopOnFocus: true
+            }).showToast();
+        }
+        
+        function showErrorToast(message) {
+            Toastify({
+                text: message,
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
+                stopOnFocus: true
+            }).showToast();
+        }
+        
+        // Inisialisasi Supabase
+        const SUPABASE_URL = 'https://your-project.supabase.co';
+        const SUPABASE_KEY = 'your-anon-key';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        // Variabel global untuk data siswa dan pagination
+        let studentsData = [];
+        let currentPage = 1;
+        const itemsPerPage = 8;
+        
+        // DOM Elements
+        const studentsTableBody = document.getElementById('students-table-body');
+        const totalStudents = document.getElementById('total-students');
+        const currentPageSpan = document.getElementById('current-page');
+        const totalPagesSpan = document.getElementById('total-pages');
+        const prevPageBtn = document.getElementById('prev-page');
+        const nextPageBtn = document.getElementById('next-page');
+        const searchInput = document.getElementById('search-student');
+        const addStudentBtn = document.getElementById('add-student-btn');
+        const studentModal = document.getElementById('student-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const studentForm = document.getElementById('student-form');
+        const closeModalBtn = document.getElementById('close-modal');
+        const cancelModalBtn = document.getElementById('cancel-modal');
+        const studentIdInput = document.getElementById('student-id');
+        const nameInput = document.getElementById('name');
+        const nisInput = document.getElementById('nis');
+        const classInput = document.getElementById('class');
+        
+        // Fungsi untuk memuat data siswa dari Supabase
+        async function loadStudents() {
+            try {
+                const { data, error } = await supabase
+                    .from('siswa')
+                    .select('*')
+                    .order('nama', { ascending: true });
+                
+                if (error) throw error;
+                
+                studentsData = data;
+                totalStudents.textContent = studentsData.length;
+                renderStudentsTable();
+            } catch (error) {
+                console.error('Error loading students:', error);
+                showErrorToast('Gagal memuat data siswa');
+            }
+        }
+        
+        // Fungsi untuk merender tabel siswa
+        function renderStudentsTable() {
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const paginatedStudents = studentsData.slice(startIndex, endIndex);
+            
+            studentsTableBody.innerHTML = '';
+            
+            if (paginatedStudents.length === 0) {
+                studentsTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="py-8 text-center text-gray-500">
+                            <i class="fas fa-user-slash text-3xl mb-3"></i>
+                            <p>Tidak ada data siswa</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            paginatedStudents.forEach(student => {
+                const row = document.createElement('tr');
+                row.className = 'border-b border-gray-700 hover:bg-gray-800/50';
+                row.innerHTML = `
+                    <td class="py-4">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 rounded-full bg-premium-500/20 flex items-center justify-center mr-3">
+                                <span class="text-premium-300">${student.nama.charAt(0)}</span>
+                            </div>
+                            <span>${student.nama}</span>
+                        </div>
+                    </td>
+                    <td class="py-4">${student.nis}</td>
+                    <td class="py-4">${student.kelas}</td>
+                    <td class="py-4">
+                        <div class="flex items-center">
+                            <div class="w-24 bg-gray-700 rounded-full h-2.5 mr-2">
+                                <div class="bg-green-500 h-2.5 rounded-full" style="width: ${Math.floor(Math.random() * 100)}%"></div>
+                            </div>
+                            <span>${Math.floor(Math.random() * 100)}%</span>
+                        </div>
+                    </td>
+                    <td class="py-4 text-right">
+                        <button class="edit-btn px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white rounded-lg mr-2" data-id="${student.id}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="delete-btn px-3 py-1 bg-red-600 hover:bg-red-500 text-white rounded-lg" data-id="${student.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                studentsTableBody.appendChild(row);
+            });
+            
+            // Update pagination
+            const totalPages = Math.ceil(studentsData.length / itemsPerPage);
+            currentPageSpan.textContent = currentPage;
+            totalPagesSpan.textContent = totalPages;
+            
+            prevPageBtn.disabled = currentPage === 1;
+            nextPageBtn.disabled = currentPage === totalPages;
+        }
+        
+        // Fungsi untuk menambahkan/memperbarui siswa
+        async function saveStudent(e) {
+            e.preventDefault();
+            
+            const studentData = {
+                nama: nameInput.value,
+                nis: nisInput.value,
+                kelas: classInput.value
+            };
+            
+            try {
+                if (studentIdInput.value) {
+                    // Update existing student
+                    const { error } = await supabase
+                        .from('siswa')
+                        .update(studentData)
+                        .eq('id', studentIdInput.value);
+                    
+                    if (error) throw error;
+                    showSuccessToast('Data siswa berhasil diperbarui!');
+                } else {
+                    // Add new student
+                    const { error } = await supabase
+                        .from('siswa')
+                        .insert([studentData]);
+                    
+                    if (error) throw error;
+                    showSuccessToast('Siswa baru berhasil ditambahkan!');
+                }
+                
+                studentModal.classList.add('hidden');
+                loadStudents();
+            } catch (error) {
+                console.error('Error saving student:', error);
+                showErrorToast('Gagal menyimpan data siswa');
+            }
+        }
+        
+        // Fungsi untuk menghapus siswa
+        async function deleteStudent(studentId) {
+            if (!confirm('Apakah Anda yakin ingin menghapus siswa ini?')) return;
+            
+            try {
+                const { error } = await supabase
+                    .from('siswa')
+                    .delete()
+                    .eq('id', studentId);
+                
+                if (error) throw error;
+                
+                showSuccessToast('Siswa berhasil dihapus!');
+                loadStudents();
+            } catch (error) {
+                console.error('Error deleting student:', error);
+                showErrorToast('Gagal menghapus siswa');
+            }
+        }
+        
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            loadStudents();
+            
+            // Pagination
+            prevPageBtn.addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    renderStudentsTable();
+                }
+            });
+            
+            nextPageBtn.addEventListener('click', () => {
+                const totalPages = Math.ceil(studentsData.length / itemsPerPage);
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    renderStudentsTable();
+                }
+            });
+            
+            // Pencarian siswa
+            searchInput.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                if (searchTerm) {
+                    const filteredStudents = studentsData.filter(student => 
+                        student.nama.toLowerCase().includes(searchTerm) || 
+                        student.nis.toLowerCase().includes(searchTerm)
+                    );
+                    studentsData = filteredStudents;
+                } else {
+                    loadStudents();
+                }
+                currentPage = 1;
+                renderStudentsTable();
+            });
+            
+            // Modal
+            addStudentBtn.addEventListener('click', () => {
+                modalTitle.textContent = 'Tambah Siswa';
+                studentIdInput.value = '';
+                studentForm.reset();
+                studentModal.classList.remove('hidden');
+            });
+            
+            closeModalBtn.addEventListener('click', () => {
+                studentModal.classList.add('hidden');
+            });
+            
+            cancelModalBtn.addEventListener('click', () => {
+                studentModal.classList.add('hidden');
+            });
+            
+            studentForm.addEventListener('submit', saveStudent);
+            
+            // Edit dan Delete (event delegation)
+            studentsTableBody.addEventListener('click', (e) => {
+                // Edit button
+                if (e.target.closest('.edit-btn')) {
+                    const studentId = e.target.closest('.edit-btn').dataset.id;
+                    const student = studentsData.find(s => s.id == studentId);
+                    
+                    if (student) {
+                        modalTitle.textContent = 'Edit Siswa';
+                        studentIdInput.value = student.id;
+                        nameInput.value = student.nama;
+                        nisInput.value = student.nis;
+                        classInput.value = student.kelas;
+                        studentModal.classList.remove('hidden');
+                    }
+                }
+                
+                // Delete button
+                if (e.target.closest('.delete-btn')) {
+                    const studentId = e.target.closest('.delete-btn').dataset.id;
+                    deleteStudent(studentId);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
